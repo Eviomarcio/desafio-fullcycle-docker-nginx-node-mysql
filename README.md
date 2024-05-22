@@ -23,5 +23,16 @@ cd desafio-fullcycle-docker-nginx-node-mysql
 
 docker-compose up [-d]
 ```
+
+### Visualizando a Lista de Nomes
+
+Para visualizar a lista de nomes, abra um navegador e acesse:
+
+```
+http://localhost:8080
+```
+
+Você verá uma página web com a mensagem "Full Cycle" seguida pela lista atualizada de nomes.
+
 <br/>
 <br/>
