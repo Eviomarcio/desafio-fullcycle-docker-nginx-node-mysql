@@ -1,0 +1,103 @@
+# version: '3'
+
+# services:
+#   nginx:
+#     build:
+#       context: ./nginx
+#     container_name: nginx
+#     restart: always
+#     ports: 
+#       - '8080:80'
+#     volumes:
+#       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+#     depends_on:
+#       - app
+#     networks:
+#       - fullcycle
+#   app:
+#     build:
+#       context: node
+#     container_name: app
+#     #entrypoint: ["dockerize", "-wait", "tcp://db:3306", "-timeout", "60s", "node", "index.js"]
+#     #entrypoint: wait-for database:3306 -t 40 -- ./start.sh
+#     command: "node index.js"
+#     networks:
+#       - fullcycle
+#     volumes:
+#       - ./node:/usr/src/app
+#     tty: true
+#     ports:
+#       - "3000:3000"
+#     depends_on:
+#       - db
+#   db:
+#     image: mysql:5.7
+#     platform: linux/amd64
+#     command: --innodb-use-native-aio=0
+#     container_name: db
+#     restart: always
+#     tty: true
+#     volumes: 
+#       - ./mysql:/var/lib/mysql
+#     environment: 
+#       - MYSQL_DATABASE=nodedb
+#       - MYSQL_ROOT_PASSWORD=root
+#     networks: 
+#       - fullcycle
+
+# networks:
+#   fullcycle:
+#     driver: bridge
+
+version: '3'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    ports: 
+      - '8080:80'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - fullcycle
+
+  app:
+    build:
+      context: ./node
+    container_name: app
+    depends_on:
+      - db
+    networks:
+      - fullcycle
+    volumes:
+      - ./node:/usr/src/app
+    tty: true
+    ports:
+      - "3000:3000"
+    entrypoint: ["dockerize", "-wait", "tcp://db:3306", "-timeout", "60s", "node", "index.js"]
+    #entrypoint: dockerize -wait tcp://db:3306 -timeout 60s docker-entrypoint.sh
+
+  db:
+    image: mysql:8.0.33
+    platform: linux/amd64
+    container_name: db
+    restart: always
+    tty: true
+    volumes: 
+      - ./mysql:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment: 
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=root
+    networks: 
+      - fullcycle
+    command: --default-authentication-plugin=mysql_native_password
+
+networks:
+  fullcycle:
+    driver: bridge
+
