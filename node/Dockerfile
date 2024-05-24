@@ -16,5 +16,5 @@ RUN apt-get update \
     && apt-get autoremove -yqq --purge wget && rm -rf /var/lib/apt/lists/*
 
 COPY . .
-    
-#ENTRYPOINT ["dockerize", "-wait", "tcp://db:3306", "-timeout", "60s", "node", "index.js"]
+
+ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
